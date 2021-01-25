@@ -1,10 +1,7 @@
-# Workerman
-[![Gitter](https://badges.gitter.im/walkor/Workerman.svg)](https://gitter.im/walkor/Workerman?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
-[![Latest Stable Version](https://poser.pugx.org/workerman/workerman/v/stable)](https://packagist.org/packages/workerman/workerman)
-[![Total Downloads](https://poser.pugx.org/workerman/workerman/downloads)](https://packagist.org/packages/workerman/workerman)
-[![Monthly Downloads](https://poser.pugx.org/workerman/workerman/d/monthly)](https://packagist.org/packages/workerman/workerman)
-[![Daily Downloads](https://poser.pugx.org/workerman/workerman/d/daily)](https://packagist.org/packages/workerman/workerman)
-[![License](https://poser.pugx.org/workerman/workerman/license)](https://packagist.org/packages/workerman/workerman)
+# ObservableWorker
+
+*- description coming soon -*
+
 
 ## What is it
 Workerman is an asynchronous event-driven PHP framework with high performance to build fast and scalable network applications. 
@@ -12,15 +9,15 @@ Workerman supports HTTP, Websocket, SSL and other custom protocols.
 Workerman supports event extension.
 
 ## Requires
-PHP 5.3 or Higher  
+PHP 5.4 or Higher  
 A POSIX compatible operating system (Linux, OSX, BSD)  
-POSIX and PCNTL extensions required   
+POSIX and PCNTL extensions
 Event extension recommended for better performance  
 
 ## Installation
 
 ```
-composer require workerman/workerman
+composer require observableworker/observableworker
 ```
 
 ## Basic Usage
