@@ -19,6 +19,8 @@ use ObservableWorker\Connection\TcpConnection;
 use ObservableWorker\Connection\UdpConnection;
 use ObservableWorker\Lib\Timer;
 use ObservableWorker\Events\Select;
+use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use \Exception;
 
 /**
@@ -32,7 +34,7 @@ class Worker
      *
      * @var string
      */
-    const VERSION = '5.0.0';
+    const VERSION = '5.1.0';
 
     /**
      * Status starting.
@@ -270,6 +272,13 @@ class Worker
      * @var mixed
      */
     public static $logFile = '';
+
+	/**
+	 * PSR-3 logger.
+	 *
+	 * @var LoggerInterface
+	 */
+	public static $logger = null;
 
     /**
      * Global event loop.
@@ -618,8 +627,8 @@ class Worker
     {
         $fd = \fopen(static::$_startFile, 'r');
         if ($fd && !flock($fd, LOCK_EX)) {
-            static::log('Workerman['.static::$_startFile.'] already running.');
-            exit;
+        	self::log( LogLevel::WARNING, 'Already running.' );
+        	self::terminate();
         }
     }
 
@@ -655,7 +664,7 @@ class Worker
                 $worker->user = static::getCurrentUser();
             } else {
                 if (\posix_getuid() !== 0 && $worker->user !== static::getCurrentUser()) {
-                    static::log('Warning: You must have the root privileges to change uid and gid.');
+                    self::log( LogLevel::ERROR, 'You must have the root privileges to change uid and gid.' );
                 }
             }
 
@@ -904,7 +913,8 @@ class Worker
                 $mode_str = 'in DEBUG mode';
             }
         }
-        static::log("Workerman[$start_file] $command $mode_str");
+        //static::old_log("Workerman[$start_file] $command $mode_str");
+        //self::log( LogLevel::DEBUG, $command . ' ' . $mode_str );
 
         // Get master process PID.
         $master_pid      = \is_file(static::$pidFile) ? \file_get_contents(static::$pidFile) : 0;
@@ -912,12 +922,12 @@ class Worker
         // Master is still alive?
         if ($master_is_alive) {
             if ($command === 'start') {
-                static::log("Workerman[$start_file] already running");
-                exit;
+            	self::log( LogLevel::WARNING, 'Already running.' );
+            	self::terminate();
             }
         } elseif ($command !== 'start' && $command !== 'restart') {
-            static::log("Workerman[$start_file] not run");
-            exit;
+	        self::log( LogLevel::WARNING, 'Not run.' );
+	        self::terminate();
         }
 
         // execute command.
@@ -943,11 +953,11 @@ class Worker
                     // Echo status data.
                     static::safeEcho(static::formatStatusData());
                     if ($mode !== '-d') {
-                        exit(0);
+                        self::terminate();
                     }
                     static::safeEcho("\nPress Ctrl+C to quit.\n\n");
                 }
-                exit(0);
+                self::terminate();
             case 'connections':
                 if (\is_file(static::$_statisticsFile) && \is_writable(static::$_statisticsFile)) {
                     \unlink(static::$_statisticsFile);
@@ -960,17 +970,17 @@ class Worker
                 if(\is_readable(static::$_statisticsFile)) {
                     \readfile(static::$_statisticsFile);
                 }
-                exit(0);
+                self::terminate();
             case 'restart':
             case 'stop':
                 if ($mode === '-g') {
                     static::$_gracefulStop = true;
                     $sig = \SIGHUP;
-                    static::log("Workerman[$start_file] is gracefully stopping ...");
+                    //static::old_log("Workerman[$start_file] is gracefully stopping ...");
                 } else {
                     static::$_gracefulStop = false;
                     $sig = \SIGINT;
-                    static::log("Workerman[$start_file] is stopping ...");
+                    //static::old_log("Workerman[$start_file] is stopping ...");
                 }
                 // Send stop signal to master process.
                 $master_pid && \posix_kill($master_pid, $sig);
@@ -983,17 +993,18 @@ class Worker
                     if ($master_is_alive) {
                         // Timeout?
                         if (!static::$_gracefulStop && \time() - $start_time >= $timeout) {
-                            static::log("Workerman[$start_file] stop fail");
-                            exit;
+	                        self::log( LogLevel::CRITICAL, 'Stop fail.' );
+	                        self::terminate();
                         }
                         // Waiting amoment.
                         \usleep(10000);
                         continue;
                     }
                     // Stop success.
-                    static::log("Workerman[$start_file] stop success");
+	                self::log( LogLevel::INFO, 'Stop success.' );
+	                self::terminate();
                     if ($command === 'stop') {
-                        exit(0);
+                        self::terminate();
                     }
                     if ($mode === '-d') {
                         static::$daemonize = true;
@@ -1008,7 +1019,7 @@ class Worker
                     $sig = \SIGUSR1;
                 }
                 \posix_kill($master_pid, $sig);
-                exit;
+                self::terminate();
             default :
                 if (isset($command)) {
                     static::safeEcho('Unknown command: ' . $command . "\n");
@@ -1220,7 +1231,7 @@ class Worker
         if (-1 === $pid) {
             throw new Exception('Fork fail');
         } elseif ($pid > 0) {
-            exit(0);
+            self::terminate();
         }
         if (-1 === \posix_setsid()) {
             throw new Exception("Setsid fail");
@@ -1230,7 +1241,7 @@ class Worker
         if (-1 === $pid) {
             throw new Exception("Fork fail");
         } elseif (0 !== $pid) {
-            exit(0);
+            self::terminate();
         }
     }
 
@@ -1399,7 +1410,7 @@ class Worker
         {
             if(\count(static::$_workers) > 1)
             {
-                static::safeEcho("@@@ Error: multi workers init in one php file are not support @@@\r\n");
+                static::safeEcho("@@@ Error: multi workers init in one php file are not supported @@@\r\n");
                 static::safeEcho("@@@ See http://doc.workerman.net/faq/multi-woker-for-windows.html @@@\r\n");
             }
             elseif(\count(static::$_workers) <= 0)
@@ -1553,11 +1564,11 @@ class Worker
             $worker->id = $id;
             $worker->run();
             if (strpos(static::$eventLoopClass, 'ObservableWorker\Events\Swoole') !== false) {
-                exit(0);
+                self::terminate();
             }
             $err = new Exception('event-loop exited');
-            static::log($err);
-            exit(250);
+	        self::log( LogLevel::ALERT, 'Event-loop exited.' );
+            self::abort( 250 );
         } else {
             throw new Exception("forkOneWorker fail");
         }
@@ -1586,7 +1597,7 @@ class Worker
         // Get uid.
         $user_info = \posix_getpwnam($this->user);
         if (!$user_info) {
-            static::log("Warning: User {$this->user} not exsits");
+        	self::log( LogLevel::WARNING, "User {$this->user} not exists." );
             return;
         }
         $uid = $user_info['uid'];
@@ -1594,7 +1605,7 @@ class Worker
         if ($this->group) {
             $group_info = \posix_getgrnam($this->group);
             if (!$group_info) {
-                static::log("Warning: Group {$this->group} not exsits");
+	            self::log( LogLevel::WARNING, "Group {$this->group} not exists." );
                 return;
             }
             $gid = $group_info['gid'];
@@ -1605,7 +1616,7 @@ class Worker
         // Set uid and gid.
         if ($uid !== \posix_getuid() || $gid !== \posix_getgid()) {
             if (!\posix_setgid($gid) || !\posix_initgroups($user_info['name'], $gid) || !\posix_setuid($uid)) {
-                static::log("Warning: change gid or uid fail.");
+                self::log( LogLevel::ERROR, 'Change GID or UID fail.' );
             }
         }
     }
@@ -1667,7 +1678,7 @@ class Worker
                         $worker = static::$_workers[$worker_id];
                         // Exit status.
                         if ($status !== 0) {
-                            static::log("worker[" . $worker->name . ":$pid] exit with status $status");
+                            self::log( LogLevel::WARNING, "Worker[" . $worker->name . ":$pid] exit with status $status." );
                         }
 
                         // For Statistics.
@@ -1731,11 +1742,11 @@ class Worker
             }
         }
         @\unlink(static::$pidFile);
-        static::log("Workerman[" . \basename(static::$_startFile) . "] has been stopped");
+        //static::old_log("Workerman[" . \basename(static::$_startFile) . "] has been stopped");
         if (static::$onMasterStop) {
             \call_user_func(static::$onMasterStop);
         }
-        exit(0);
+        self::terminate();
     }
 
     /**
@@ -1749,18 +1760,15 @@ class Worker
         if (static::$_masterPid === \posix_getpid()) {
             // Set reloading state.
             if (static::$_status !== static::STATUS_RELOADING && static::$_status !== static::STATUS_SHUTDOWN) {
-                static::log("Workerman[" . \basename(static::$_startFile) . "] reloading");
+            	self::log( LogLevel::INFO, 'Reloading.' );
                 static::$_status = static::STATUS_RELOADING;
                 // Try to emit onMasterReload callback.
                 if (static::$onMasterReload) {
                     try {
                         \call_user_func(static::$onMasterReload);
-                    } catch (\Exception $e) {
-                        static::log($e);
-                        exit(250);
-                    } catch (\Error $e) {
-                        static::log($e);
-                        exit(250);
+                    } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
                     }
                     static::initId();
                 }
@@ -1814,12 +1822,9 @@ class Worker
             if ($worker->onWorkerReload) {
                 try {
                     \call_user_func($worker->onWorkerReload, $worker);
-                } catch (\Exception $e) {
-                    static::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    static::log($e);
-                    exit(250);
+                } catch (\Throwable $e) {
+	                self::log( LogLevel::ALERT, $e );
+	                self::abort( 250 );
                 }
             }
 
@@ -1839,7 +1844,7 @@ class Worker
         static::$_status = static::STATUS_SHUTDOWN;
         // For master process.
         if (static::$_masterPid === \posix_getpid()) {
-            static::log("Workerman[" . \basename(static::$_startFile) . "] stopping ...");
+            //static::old_log("Workerman[" . \basename(static::$_startFile) . "] stopping ...");
             $worker_pid_array = static::getAllWorkerPids();
             // Send stop signal to all child processes.
             if (static::$_gracefulStop) {
@@ -1874,7 +1879,7 @@ class Worker
                 }
 
                 try {
-                    exit(0);
+                    self::terminate();
                 } catch (Exception $e) {
 
                 }
@@ -2082,7 +2087,6 @@ class Worker
     public static function checkErrors()
     {
         if (static::STATUS_SHUTDOWN !== static::$_status) {
-            $error_msg = static::$_OS === \OS_TYPE_LINUX ? 'Worker['. \posix_getpid() .'] process terminated' : 'Worker process terminated';
             $errors    = error_get_last();
             if ($errors && ($errors['type'] === \E_ERROR ||
                     $errors['type'] === \E_PARSE ||
@@ -2090,9 +2094,10 @@ class Worker
                     $errors['type'] === \E_COMPILE_ERROR ||
                     $errors['type'] === \E_RECOVERABLE_ERROR)
             ) {
-                $error_msg .= ' with ERROR: ' . static::getErrorType($errors['type']) . " \"{$errors['message']} in {$errors['file']} on line {$errors['line']}\"";
+                $error_msg = 'PHP: ' . static::getErrorType($errors['type']) . " \"{$errors['message']} in {$errors['file']} on line {$errors['line']}\"";
+	            self::log( LogLevel::ERROR, $error_msg );
             }
-            static::log($error_msg);
+	        self::log( LogLevel::ERROR, ( static::$_OS === \OS_TYPE_LINUX ? 'Worker['. \posix_getpid() .'] process terminated.' : 'Worker process terminated.' ) );
         }
     }
 
@@ -2117,7 +2122,7 @@ class Worker
      * @param string $msg
      * @return void
      */
-    public static function log($msg)
+    public static function old_log($msg)
     {
         $msg = $msg . "\n";
         if (!static::$daemonize) {
@@ -2126,6 +2131,49 @@ class Worker
         \file_put_contents((string)static::$logFile, \date('Y-m-d H:i:s') . ' ' . 'pid:'
             . (static::$_OS === \OS_TYPE_LINUX ? \posix_getpid() : 1) . ' ' . $msg, \FILE_APPEND | \LOCK_EX);
     }
+
+	/**
+	 * Log with PSR-3.
+	 *
+	 * @param   LogLevel            $level      The level at which to log.
+	 * @param   Throwable|string    $message    The message or the exception to log.
+	 * @param   integer|null        $code       Optional. The error code.
+	 * @return void
+	 */
+	public static function log( $level, $message, $code = null) {
+		if ( isset( self::$logger ) ) {
+			if ( is_subclass_of( $message, 'Throwable', false ) ) {
+				self::$logger->log( $level, ucfirst( $message->getMessage() ), [ 'code' => ( isset( $code ) && 0 !== $code ? $code : $message->getCode() ) ] );
+			} elseif ( is_string( $message) ) {
+				self::$logger->log( $level, ucfirst( $message ), ( isset( $code ) ? [ 'code' => $code ] : [] ) );
+			} else {
+				self::$logger->log( $level, '<no message>', ( isset( $code ) ? [ 'code' => $code ] : [] ) );
+			}
+		}
+	}
+
+	/**
+	 * Abort exectution.
+	 *
+	 * @param   integer        $code       Optional. The exit code.
+	 */
+	private static function abort( $code = 0 ) {
+		if ( isset( self::$logger ) && 0 !== $code) {
+			if ( 0 !== $code) {
+				self::$logger->emergency( 'Stopping immediately.', [ 'code' => $code ] );
+			} else {
+				self::$logger->notice( 'Stopped.' );
+			}
+		}
+		exit( $code );
+	}
+
+	/**
+	 * Terminate exectution.
+	 */
+	private static function terminate() {
+		self::abort();
+	}
 
     /**
      * Safe Echo.
@@ -2252,9 +2300,9 @@ class Worker
             }
 
             // Create an Internet or Unix domain server socket.
-            $this->_mainSocket = \stream_socket_server($local_socket, $errno, $errmsg, $flags, $this->_context);
+	        $this->_mainSocket = \stream_socket_server($local_socket, $errno, $errmsg, $flags, $this->_context);
             if (!$this->_mainSocket) {
-                throw new Exception($errmsg);
+                throw new Exception($errmsg, $errno);
             }
 
             if ($this->transport === 'ssl') {
@@ -2413,16 +2461,11 @@ class Worker
         if ($this->onWorkerStart) {
             try {
                 \call_user_func($this->onWorkerStart, $this);
-            } catch (\Exception $e) {
-                static::log($e);
-                // Avoid rapid infinite loop exit.
-                sleep(1);
-                exit(250);
-            } catch (\Error $e) {
-                static::log($e);
-                // Avoid rapid infinite loop exit.
-                sleep(1);
-                exit(250);
+            } catch (\Throwable $e) {
+	            self::log( LogLevel::ALERT, $e );
+	            // Avoid rapid infinite loop exit.
+	            sleep(1);
+	            self::abort( 250 );
             }
         }
 
@@ -2441,12 +2484,9 @@ class Worker
         if ($this->onWorkerStop) {
             try {
                 \call_user_func($this->onWorkerStop, $this);
-            } catch (\Exception $e) {
-                static::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                static::log($e);
-                exit(250);
+            } catch (\Throwable $e) {
+	            self::log( LogLevel::ALERT, $e );
+	            self::abort( 250 );
             }
         }
         // Remove listener for server socket.
@@ -2495,12 +2535,9 @@ class Worker
         if ($this->onConnect) {
             try {
                 \call_user_func($this->onConnect, $connection);
-            } catch (\Exception $e) {
-                static::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                static::log($e);
-                exit(250);
+            } catch (\Throwable $e) {
+	            self::log( LogLevel::ALERT, $e );
+	            self::abort( 250 );
             }
         }
     }
@@ -2550,12 +2587,9 @@ class Worker
                     \call_user_func($this->onMessage, $connection, $recv_buffer);
                 }
                 ++ConnectionInterface::$statistics['total_request'];
-            } catch (\Exception $e) {
-                static::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                static::log($e);
-                exit(250);
+            } catch (\Throwable $e) {
+	            self::log( LogLevel::ALERT, $e );
+	            self::abort( 250 );
             }
         }
         return true;

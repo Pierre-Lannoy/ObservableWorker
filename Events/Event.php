@@ -164,13 +164,10 @@ class Event implements EventInterface
 
         try {
             \call_user_func_array($param[0], $param[1]);
-        } catch (\Exception $e) {
-            Worker::log($e);
-            exit(250);
-        } catch (\Error $e) {
-            Worker::log($e);
-            exit(250);
-        }
+        } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
     }
     
     /**

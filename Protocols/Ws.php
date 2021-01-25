@@ -95,13 +95,10 @@ class Ws
                     if (isset($connection->onWebSocketClose)) {
                         try {
                             \call_user_func($connection->onWebSocketClose, $connection);
-                        } catch (\Exception $e) {
-                            Worker::log($e);
-                            exit(250);
-                        } catch (\Error $e) {
-                            Worker::log($e);
-                            exit(250);
-                        }
+                        } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                     } // Close connection.
                     else {
                         $connection->close();
@@ -153,13 +150,10 @@ class Ws
                         if (isset($connection->onWebSocketPing)) {
                             try {
                                 \call_user_func($connection->onWebSocketPing, $connection, $ping_data);
-                            } catch (\Exception $e) {
-                                Worker::log($e);
-                                exit(250);
-                            } catch (\Error $e) {
-                                Worker::log($e);
-                                exit(250);
-                            }
+                            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                         } else {
                             $connection->send($ping_data);
                         }
@@ -180,13 +174,10 @@ class Ws
                         if (isset($connection->onWebSocketPong)) {
                             try {
                                 \call_user_func($connection->onWebSocketPong, $connection, $pong_data);
-                            } catch (\Exception $e) {
-                                Worker::log($e);
-                                exit(250);
-                            } catch (\Error $e) {
-                                Worker::log($e);
-                                exit(250);
-                            }
+                            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                         }
                         $connection->websocketType = $tmp_connection_type;
                         if ($recv_len > $current_frame_length) {
@@ -262,12 +253,9 @@ class Ws
                 if ($connection->onError) {
                     try {
                         \call_user_func($connection->onError, $connection, \ObservableWorker_SEND_FAIL, 'send buffer full and drop package');
-                    } catch (\Exception $e) {
-                        Worker::log($e);
-                        exit(250);
-                    } catch (\Error $e) {
-                        Worker::log($e);
-                        exit(250);
+                    } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
                     }
                 }
                 return '';
@@ -278,12 +266,9 @@ class Ws
                 if ($connection->onBufferFull) {
                     try {
                         \call_user_func($connection->onBufferFull, $connection);
-                    } catch (\Exception $e) {
-                        Worker::log($e);
-                        exit(250);
-                    } catch (\Error $e) {
-                        Worker::log($e);
-                        exit(250);
+                    } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
                     }
                 }
             }
@@ -430,13 +415,10 @@ class Ws
             if (isset($connection->onWebSocketConnect)) {
                 try {
                     \call_user_func($connection->onWebSocketConnect, $connection, \substr($buffer, 0, $handshake_response_length));
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
             // Headbeat.
             if (!empty($connection->websocketPingInterval)) {

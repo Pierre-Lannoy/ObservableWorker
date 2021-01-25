@@ -274,13 +274,10 @@ class AsyncTcpConnection extends TcpConnection
         if ($this->onError) {
             try {
                 \call_user_func($this->onError, $this, $code, $msg);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
     }
 
@@ -342,25 +339,18 @@ class AsyncTcpConnection extends TcpConnection
             if ($this->onConnect) {
                 try {
                     \call_user_func($this->onConnect, $this);
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
             // Try to emit protocol::onConnect
             if ($this->protocol && \method_exists($this->protocol, 'onConnect')) {
                 try {
                     \call_user_func(array($this->protocol, 'onConnect'), $this);
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
         } else {
             // Connection failed.

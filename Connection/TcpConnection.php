@@ -15,6 +15,7 @@ namespace ObservableWorker\Connection;
 use ObservableWorker\Events\EventInterface;
 use ObservableWorker\Worker;
 use \Exception;
+use Psr\Log\LogLevel;
 
 /**
  * TcpConnection.
@@ -346,10 +347,8 @@ class TcpConnection extends ConnectionInterface
             $len = 0;
             try {
                 $len = @\fwrite($this->_socket, $send_buffer);
-            } catch (\Exception $e) {
-                Worker::log($e);
-            } catch (\Error $e) {
-                Worker::log($e);
+            } catch (\Throwable $e) {
+                Worker::log( LogLevel::ERROR, $e );
             }
             // send successful.
             if ($len === \strlen($send_buffer)) {
@@ -367,13 +366,10 @@ class TcpConnection extends ConnectionInterface
                     if ($this->onError) {
                         try {
                             \call_user_func($this->onError, $this, \ObservableWorker_SEND_FAIL, 'client closed');
-                        } catch (\Exception $e) {
-                            Worker::log($e);
-                            exit(250);
-                        } catch (\Error $e) {
-                            Worker::log($e);
-                            exit(250);
-                        }
+                        } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                     }
                     $this->destroy();
                     return false;
@@ -634,13 +630,10 @@ class TcpConnection extends ConnectionInterface
                 try {
                     // Decode request buffer before Emitting onMessage callback.
                     \call_user_func($this->onMessage, $this, $parser::decode($one_request_buffer, $this));
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
             return;
         }
@@ -657,13 +650,10 @@ class TcpConnection extends ConnectionInterface
         }
         try {
             \call_user_func($this->onMessage, $this, $this->_recvBuffer);
-        } catch (\Exception $e) {
-            Worker::log($e);
-            exit(250);
-        } catch (\Error $e) {
-            Worker::log($e);
-            exit(250);
-        }
+        } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         // Clean receive buffer.
         $this->_recvBuffer = '';
     }
@@ -690,13 +680,10 @@ class TcpConnection extends ConnectionInterface
             if ($this->onBufferDrain) {
                 try {
                     \call_user_func($this->onBufferDrain, $this);
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
             if ($this->_status === self::STATUS_CLOSING) {
                 $this->destroy();
@@ -760,13 +747,10 @@ class TcpConnection extends ConnectionInterface
         if (isset($this->onSslHandshake)) {
             try {
                 \call_user_func($this->onSslHandshake, $this);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
         return true;
     }
@@ -857,13 +841,10 @@ class TcpConnection extends ConnectionInterface
             if ($this->onBufferFull) {
                 try {
                     \call_user_func($this->onBufferFull, $this);
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
         }
     }
@@ -880,13 +861,10 @@ class TcpConnection extends ConnectionInterface
             if ($this->onError) {
                 try {
                     \call_user_func($this->onError, $this, \ObservableWorker_SEND_FAIL, 'send buffer full and drop package');
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
             }
             return true;
         }
@@ -928,25 +906,19 @@ class TcpConnection extends ConnectionInterface
         if ($this->onClose) {
             try {
                 \call_user_func($this->onClose, $this);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
         // Try to emit protocol::onClose
         if ($this->protocol && \method_exists($this->protocol, 'onClose')) {
             try {
                 \call_user_func(array($this->protocol, 'onClose'), $this);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
         $this->_sendBuffer = $this->_recvBuffer = '';
         $this->_currentPackageLength = 0;
@@ -977,7 +949,7 @@ class TcpConnection extends ConnectionInterface
             }
 
             if (0 === self::$statistics['connection_count'] % $mod) {
-                Worker::log('worker[' . \posix_getpid() . '] remains ' . self::$statistics['connection_count'] . ' connection(s)');
+                Worker::old_log('worker[' . \posix_getpid() . '] remains ' . self::$statistics['connection_count'] . ' connection(s)');
             }
 
             if(0 === self::$statistics['connection_count']) {

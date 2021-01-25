@@ -92,13 +92,10 @@ class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
                     if (isset($connection->onWebSocketClose) || isset($connection->worker->onWebSocketClose)) {
                         try {
                             \call_user_func(isset($connection->onWebSocketClose)?$connection->onWebSocketClose:$connection->worker->onWebSocketClose, $connection);
-                        } catch (\Exception $e) {
-                            Worker::log($e);
-                            exit(250);
-                        } catch (\Error $e) {
-                            Worker::log($e);
-                            exit(250);
-                        }
+                        } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                     } // Close connection.
                     else {
                         $connection->close("\x88\x02\x03\xe8", true);
@@ -155,13 +152,10 @@ class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
                         if (isset($connection->onWebSocketPing) || isset($connection->worker->onWebSocketPing)) {
                             try {
                                 \call_user_func(isset($connection->onWebSocketPing)?$connection->onWebSocketPing:$connection->worker->onWebSocketPing, $connection, $ping_data);
-                            } catch (\Exception $e) {
-                                Worker::log($e);
-                                exit(250);
-                            } catch (\Error $e) {
-                                Worker::log($e);
-                                exit(250);
-                            }
+                            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                         } else {
                             $connection->send($ping_data);
                         }
@@ -181,13 +175,10 @@ class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
                         if (isset($connection->onWebSocketPong) || isset($connection->worker->onWebSocketPong)) {
                             try {
                                 \call_user_func(isset($connection->onWebSocketPong)?$connection->onWebSocketPong:$connection->worker->onWebSocketPong, $connection, $pong_data);
-                            } catch (\Exception $e) {
-                                Worker::log($e);
-                                exit(250);
-                            } catch (\Error $e) {
-                                Worker::log($e);
-                                exit(250);
-                            }
+                            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                         }
                         $connection->websocketType = $tmp_connection_type;
                         if ($recv_len > $current_frame_length) {
@@ -261,12 +252,9 @@ class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
                 if ($connection->onError) {
                     try {
                         \call_user_func($connection->onError, $connection, \ObservableWorker_SEND_FAIL, 'send buffer full and drop package');
-                    } catch (\Exception $e) {
-                        Worker::log($e);
-                        exit(250);
-                    } catch (\Error $e) {
-                        Worker::log($e);
-                        exit(250);
+                    } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
                     }
                 }
                 return '';
@@ -277,12 +265,9 @@ class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
                 if ($connection->onBufferFull) {
                     try {
                         \call_user_func($connection->onBufferFull, $connection);
-                    } catch (\Exception $e) {
-                        Worker::log($e);
-                        exit(250);
-                    } catch (\Error $e) {
-                        Worker::log($e);
-                        exit(250);
+                    } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
                     }
                 }
             }
@@ -389,13 +374,10 @@ class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
                 static::parseHttpHeader($buffer);
                 try {
                     \call_user_func(isset($connection->onWebSocketConnect)?$connection->onWebSocketConnect:$connection->worker->onWebSocketConnect, $connection, $buffer);
-                } catch (\Exception $e) {
-                    Worker::log($e);
-                    exit(250);
-                } catch (\Error $e) {
-                    Worker::log($e);
-                    exit(250);
-                }
+                } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
                 if (!empty($_SESSION) && \class_exists('\GatewayWorker\Lib\Context')) {
                     $connection->session = \GatewayWorker\Lib\Context::sessionEncode($_SESSION);
                 }

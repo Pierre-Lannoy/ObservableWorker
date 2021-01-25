@@ -14,6 +14,7 @@ namespace ObservableWorker\Events;
 
 use ObservableWorker\Worker;
 use \EvWatcher;
+use Psr\Log\LogLevel;
 
 /**
  * ev eventloop
@@ -58,13 +59,10 @@ class Ev implements EventInterface
         $callback = function ($event, $socket) use ($fd, $func) {
             try {
                 \call_user_func($func, $fd);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         };
         switch ($flag) {
             case self::EV_SIGNAL:
@@ -139,13 +137,10 @@ class Ev implements EventInterface
         }
         try {
             \call_user_func_array($param[0], $param[1]);
-        } catch (\Exception $e) {
-            Worker::log($e);
-            exit(250);
-        } catch (\Error $e) {
-            Worker::log($e);
-            exit(250);
-        }
+        } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
     }
 
     /**

@@ -15,6 +15,7 @@ namespace ObservableWorker\Connection;
 use ObservableWorker\Events\EventInterface;
 use ObservableWorker\Worker;
 use \Exception;
+use Psr\Log\LogLevel;
 
 /**
  * AsyncTcpConnection.
@@ -96,13 +97,10 @@ class AsyncUdpConnection extends UdpConnection
             ++ConnectionInterface::$statistics['total_request'];
             try {
                 \call_user_func($this->onMessage, $this, $recv_buffer);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
         return true;
     }
@@ -150,13 +148,10 @@ class AsyncUdpConnection extends UdpConnection
         if ($this->onClose) {
             try {
                 \call_user_func($this->onClose, $this);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
         $this->onConnect = $this->onMessage = $this->onClose = null;
         return true;
@@ -195,13 +190,10 @@ class AsyncUdpConnection extends UdpConnection
         if ($this->onConnect) {
             try {
                 \call_user_func($this->onConnect, $this);
-            } catch (\Exception $e) {
-                Worker::log($e);
-                exit(250);
-            } catch (\Error $e) {
-                Worker::log($e);
-                exit(250);
-            }
+            } catch (\Throwable $e) {
+	                    self::log( LogLevel::ALERT, $e );
+                        self::abort( 250 );
+                    }
         }
     }
 
