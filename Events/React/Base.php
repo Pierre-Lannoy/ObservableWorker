@@ -7,8 +7,13 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net> *
+ * @copyright walkor<walkor@workerman.net>
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
+ *
+ * @author    Pierre Lannoy <https://pierre.lannoy.fr/>
+ * @copyright Pierre Lannoy <https://pierre.lannoy.fr/>
+ * @link      https://github.com/Pierre-Lannoy/ObservableWorker
+ *
  */
 namespace ObservableWorker\Events\React;
 

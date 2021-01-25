@@ -7,8 +7,13 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net> *
+ * @copyright walkor<walkor@workerman.net>
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
+ *
+ * @author    Pierre Lannoy <https://pierre.lannoy.fr/>
+ * @copyright Pierre Lannoy <https://pierre.lannoy.fr/>
+ * @link      https://github.com/Pierre-Lannoy/ObservableWorker
+ *
  */
 namespace ObservableWorker;
 require_once __DIR__ . '/Lib/Constants.php';
@@ -593,7 +598,7 @@ class Worker
 
         // Log file.
         if (empty(static::$logFile)) {
-            static::$logFile = __DIR__ . '/../workerman.log';
+            static::$logFile = __DIR__ . '/../observableworker.log';
         }
         $log_file = (string)static::$logFile;
         if (!\is_file($log_file)) {
@@ -769,7 +774,7 @@ class Worker
             return;
         }
         if (static::$_OS !== \OS_TYPE_LINUX) {
-            static::safeEcho("----------------------- WORKERMAN -----------------------------\r\n");
+            static::safeEcho("------------------- ObservableWorker --------------------------\r\n");
             static::safeEcho('Workerman version:'. static::VERSION. '          PHP version:'. \PHP_VERSION. "\r\n");
             static::safeEcho("------------------------ WORKERS -------------------------------\r\n");
             static::safeEcho("worker               listen                              processes status\r\n");
@@ -777,7 +782,7 @@ class Worker
         }
 
         //show version
-        $line_version = 'Workerman version:' . static::VERSION . \str_pad('PHP version:', 22, ' ', \STR_PAD_LEFT) . \PHP_VERSION . \PHP_EOL;
+        $line_version = 'ObservableWorker version:' . static::VERSION . \str_pad('PHP version:', 22, ' ', \STR_PAD_LEFT) . \PHP_VERSION . \PHP_EOL;
         !\defined('LINE_VERSIOIN_LENGTH') && \define('LINE_VERSIOIN_LENGTH', \strlen($line_version));
         $total_length = static::getSingleLineTotalLength();
         $line_one = '<n>' . \str_pad('<w> OBSERVABLEWORKER </w>', $total_length + \strlen('<w></w>'), '-', \STR_PAD_BOTH) . '</n>'. \PHP_EOL;
@@ -913,7 +918,6 @@ class Worker
                 $mode_str = 'in DEBUG mode';
             }
         }
-        //static::old_log("Workerman[$start_file] $command $mode_str");
         //self::log( LogLevel::DEBUG, $command . ' ' . $mode_str );
 
         // Get master process PID.
@@ -976,11 +980,9 @@ class Worker
                 if ($mode === '-g') {
                     static::$_gracefulStop = true;
                     $sig = \SIGHUP;
-                    //static::old_log("Workerman[$start_file] is gracefully stopping ...");
                 } else {
                     static::$_gracefulStop = false;
                     $sig = \SIGINT;
-                    //static::old_log("Workerman[$start_file] is stopping ...");
                 }
                 // Send stop signal to master process.
                 $master_pid && \posix_kill($master_pid, $sig);
@@ -1742,7 +1744,6 @@ class Worker
             }
         }
         @\unlink(static::$pidFile);
-        //static::old_log("Workerman[" . \basename(static::$_startFile) . "] has been stopped");
         if (static::$onMasterStop) {
             \call_user_func(static::$onMasterStop);
         }
@@ -1844,7 +1845,6 @@ class Worker
         static::$_status = static::STATUS_SHUTDOWN;
         // For master process.
         if (static::$_masterPid === \posix_getpid()) {
-            //static::old_log("Workerman[" . \basename(static::$_startFile) . "] stopping ...");
             $worker_pid_array = static::getAllWorkerPids();
             // Send stop signal to all child processes.
             if (static::$_gracefulStop) {
@@ -1944,7 +1944,7 @@ class Worker
             \file_put_contents(static::$_statisticsFile,
                 "----------------------------------------------GLOBAL STATUS----------------------------------------------------\n", \FILE_APPEND);
             \file_put_contents(static::$_statisticsFile,
-                'Workerman version:' . static::VERSION . "          PHP version:" . \PHP_VERSION . "\n", \FILE_APPEND);
+                'ObservableWorker version:' . static::VERSION . "          PHP version:" . \PHP_VERSION . "\n", \FILE_APPEND);
             \file_put_contents(static::$_statisticsFile, 'start time:' . \date('Y-m-d H:i:s',
                     static::$_globalStatistics['start_timestamp']) . '   run ' . \floor((\time() - static::$_globalStatistics['start_timestamp']) / (24 * 60 * 60)) . ' days ' . \floor(((\time() - static::$_globalStatistics['start_timestamp']) % (24 * 60 * 60)) / (60 * 60)) . " hours   \n",
                 FILE_APPEND);
@@ -2010,7 +2010,7 @@ class Worker
     {
         // For master process.
         if (static::$_masterPid === \posix_getpid()) {
-            \file_put_contents(static::$_statisticsFile, "--------------------------------------------------------------------- WORKERMAN CONNECTION STATUS --------------------------------------------------------------------------------\n", \FILE_APPEND);
+            \file_put_contents(static::$_statisticsFile, "----------------------------------------------------------------- OBSERVABLEWORKER CONNECTION STATUS -----------------------------------------------------------------------------\n", \FILE_APPEND);
             \file_put_contents(static::$_statisticsFile, "PID      Worker          CID       Trans   Protocol        ipv4   ipv6   Recv-Q       Send-Q       Bytes-R      Bytes-W       Status         Local Address          Foreign Address\n", \FILE_APPEND);
             \chmod(static::$_statisticsFile, 0722);
             foreach (static::getAllWorkerPids() as $worker_pid) {
