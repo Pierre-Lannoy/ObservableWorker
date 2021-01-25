@@ -8,7 +8,9 @@
     "authors": [
         {
             "name": "Pierre Lannoy",
-            "email": "pierre@lannoy.fr"
+            "email": "pierre@lannoy.fr",
+            "homepage": "https://pierre.lannoy.fr",
+            "role": "Current Maintainer"
         },
         {
             "name": "walkor",
