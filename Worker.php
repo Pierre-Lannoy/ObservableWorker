@@ -1,25 +1,24 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman;
+namespace ObservableWorker;
 require_once __DIR__ . '/Lib/Constants.php';
 
-use Workerman\Events\EventInterface;
-use Workerman\Connection\ConnectionInterface;
-use Workerman\Connection\TcpConnection;
-use Workerman\Connection\UdpConnection;
-use Workerman\Lib\Timer;
-use Workerman\Events\Select;
+use ObservableWorker\Events\EventInterface;
+use ObservableWorker\Connection\ConnectionInterface;
+use ObservableWorker\Connection\TcpConnection;
+use ObservableWorker\Connection\UdpConnection;
+use ObservableWorker\Lib\Timer;
+use ObservableWorker\Events\Select;
 use \Exception;
 
 /**
@@ -33,7 +32,7 @@ class Worker
      *
      * @var string
      */
-    const VERSION = '4.0.18';
+    const VERSION = '1.0.0-dev0';
 
     /**
      * Status starting.
@@ -305,7 +304,7 @@ class Worker
      *
      * @var string
      */
-    public static $processTitle = 'WorkerMan';
+    public static $processTitle = 'ObservableWorker';
 
     /**
      * The PID of master process.
@@ -466,8 +465,8 @@ class Worker
      * @var array
      */
     protected static $_availableEventLoops = array(
-        'event'    => '\Workerman\Events\Event',
-        'libevent' => '\Workerman\Events\Libevent'
+        'event'    => '\ObservableWorker\Events\Event',
+        'libevent' => '\ObservableWorker\Events\Libevent'
     );
 
     /**
@@ -772,7 +771,7 @@ class Worker
         $line_version = 'Workerman version:' . static::VERSION . \str_pad('PHP version:', 22, ' ', \STR_PAD_LEFT) . \PHP_VERSION . \PHP_EOL;
         !\defined('LINE_VERSIOIN_LENGTH') && \define('LINE_VERSIOIN_LENGTH', \strlen($line_version));
         $total_length = static::getSingleLineTotalLength();
-        $line_one = '<n>' . \str_pad('<w> WORKERMAN </w>', $total_length + \strlen('<w></w>'), '-', \STR_PAD_BOTH) . '</n>'. \PHP_EOL;
+        $line_one = '<n>' . \str_pad('<w> OBSERVABLEWORKER </w>', $total_length + \strlen('<w></w>'), '-', \STR_PAD_BOTH) . '</n>'. \PHP_EOL;
         $line_two = \str_pad('<w> WORKERS </w>' , $total_length  + \strlen('<w></w>'), '-', \STR_PAD_BOTH) . \PHP_EOL;
         static::safeEcho($line_one . $line_version . $line_two);
 
@@ -1111,7 +1110,7 @@ class Worker
         if (static::$_OS !== \OS_TYPE_LINUX) {
             return;
         }
-        $signalHandler = '\Workerman\Worker::signalHandler';
+        $signalHandler = '\ObservableWorker\Worker::signalHandler';
         // stop
         \pcntl_signal(\SIGINT, $signalHandler, false);
         // stop
@@ -1140,7 +1139,7 @@ class Worker
         if (static::$_OS !== \OS_TYPE_LINUX) {
             return;
         }
-        $signalHandler = '\Workerman\Worker::signalHandler';
+        $signalHandler = '\ObservableWorker\Worker::signalHandler';
         // uninstall stop signal handler
         \pcntl_signal(\SIGINT, \SIG_IGN, false);
         // uninstall stop signal handler
@@ -1314,20 +1313,20 @@ class Worker
             if (\interface_exists('\React\EventLoop\LoopInterface')) {
                 switch ($loop_name) {
                     case 'libevent':
-                        static::$eventLoopClass = '\Workerman\Events\React\ExtLibEventLoop';
+                        static::$eventLoopClass = '\ObservableWorker\Events\React\ExtLibEventLoop';
                         break;
                     case 'event':
-                        static::$eventLoopClass = '\Workerman\Events\React\ExtEventLoop';
+                        static::$eventLoopClass = '\ObservableWorker\Events\React\ExtEventLoop';
                         break;
                     default :
-                        static::$eventLoopClass = '\Workerman\Events\React\StreamSelectLoop';
+                        static::$eventLoopClass = '\ObservableWorker\Events\React\StreamSelectLoop';
                         break;
                 }
             } else {
                 static::$eventLoopClass = static::$_availableEventLoops[$loop_name];
             }
         } else {
-            static::$eventLoopClass = \interface_exists('\React\EventLoop\LoopInterface') ? '\Workerman\Events\React\StreamSelectLoop' : '\Workerman\Events\Select';
+            static::$eventLoopClass = \interface_exists('\React\EventLoop\LoopInterface') ? '\ObservableWorker\Events\React\StreamSelectLoop' : '\ObservableWorker\Events\Select';
         }
         return static::$eventLoopClass;
     }
@@ -1420,7 +1419,7 @@ class Worker
         }
         else
         {
-            static::$globalEvent = new \Workerman\Events\Select();
+            static::$globalEvent = new \ObservableWorker\Events\Select();
             Timer::init(static::$globalEvent);
             foreach($files as $start_file)
             {
@@ -1553,7 +1552,7 @@ class Worker
             $worker->setUserAndGroup();
             $worker->id = $id;
             $worker->run();
-            if (strpos(static::$eventLoopClass, 'Workerman\Events\Swoole') !== false) {
+            if (strpos(static::$eventLoopClass, 'ObservableWorker\Events\Swoole') !== false) {
                 exit(0);
             }
             $err = new Exception('event-loop exited');
@@ -1712,7 +1711,7 @@ class Worker
      */
     protected static function monitorWorkersForWindows()
     {
-        Timer::add(1, "\\Workerman\\Worker::checkWorkerStatusForWindows");
+        Timer::add(1, "\\ObservableWorker\\Worker::checkWorkerStatusForWindows");
 
         static::$globalEvent->loop();
     }
@@ -1854,7 +1853,7 @@ class Worker
                     Timer::add(static::KILL_WORKER_TIMER_TIME, '\posix_kill', array($worker_pid, \SIGKILL), false);
                 }
             }
-            Timer::add(1, "\\Workerman\\Worker::checkIfChildRunning");
+            Timer::add(1, "\\ObservableWorker\\Worker::checkIfChildRunning");
             // Remove statistics file.
             if (\is_file(static::$_statisticsFile)) {
                 @\unlink(static::$_statisticsFile);
@@ -1984,7 +1983,7 @@ class Worker
 
         // For child processes.
         \reset(static::$_workers);
-        /** @var \Workerman\Worker $worker */
+        /** @var \ObservableWorker\Worker $worker */
         $worker            = current(static::$_workers);
         $worker_status_str = \posix_getpid() . "\t" . \str_pad(round(memory_get_usage(true) / (1024 * 1024), 2) . "M", 7)
             . " " . \str_pad($worker->getSocketName(), static::$_maxSocketNameLength) . " "
@@ -2039,9 +2038,9 @@ class Worker
         $current_worker = current(static::$_workers);
         $default_worker_name = $current_worker->name;
 
-        /** @var \Workerman\Worker $worker */
+        /** @var \ObservableWorker\Worker $worker */
         foreach(TcpConnection::$connections as $connection) {
-            /** @var \Workerman\Connection\TcpConnection $connection */
+            /** @var \ObservableWorker\Connection\TcpConnection $connection */
             $transport      = $connection->transport;
             $ipv4           = $connection->isIpV4() ? ' 1' : ' 0';
             $ipv6           = $connection->isIpV6() ? ' 1' : ' 0';
@@ -2317,7 +2316,7 @@ class Worker
             $scheme         = \ucfirst($scheme);
             $this->protocol = \substr($scheme,0,1)==='\\' ? $scheme : 'Protocols\\' . $scheme;
             if (!\class_exists($this->protocol)) {
-                $this->protocol = "Workerman\\Protocols\\$scheme";
+                $this->protocol = "ObservableWorker\\Protocols\\$scheme";
                 if (!\class_exists($this->protocol)) {
                     throw new Exception("class \\Protocols\\$scheme not exist");
                 }
@@ -2385,7 +2384,7 @@ class Worker
         static::$_status = static::STATUS_RUNNING;
 
         // Register shutdown function for checking errors.
-        \register_shutdown_function(array("\\Workerman\\Worker", 'checkErrors'));
+        \register_shutdown_function(array("\\ObservableWorker\\Worker", 'checkErrors'));
 
         // Set autoload root path.
         Autoloader::setRootPath($this->_autoloadRootPath);
@@ -2526,7 +2525,7 @@ class Worker
         if ($this->onMessage) {
             try {
                 if ($this->protocol !== null) {
-                    /** @var \Workerman\Protocols\ProtocolInterface $parser */
+                    /** @var \ObservableWorker\Protocols\ProtocolInterface $parser */
                     $parser = $this->protocol;
                     if ($parser && \method_exists($parser, 'input')) {
                         while ($recv_buffer !== '') {

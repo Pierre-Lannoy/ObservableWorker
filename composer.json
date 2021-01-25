@@ -1,38 +1,35 @@
 {
-    "name": "workerman/workerman",
+    "name": "observableworker/observableworker",
     "type": "library",
-    "keywords": [
-        "event-loop",
-        "asynchronous"
-    ],
-    "homepage": "http://www.workerman.net",
+    "keywords": ["event-loop", "asynchronous", "observability"],
+    "homepage": "https://github.com/Pierre-Lannoy/ObservableWorker",
     "license": "MIT",
-    "description": "An asynchronous event driven PHP framework for easily building fast, scalable network applications.",
+    "description": "An asynchronous and observable event driven PHP framework for easily building fast and scalable network applications.",
     "authors": [
+        {
+            "name": "Pierre Lannoy",
+            "email": "pierre@lannoy.fr"
+        },
         {
             "name": "walkor",
             "email": "walkor@workerman.net",
             "homepage": "http://www.workerman.net",
-            "role": "Developer"
+            "role": "Initial Developer"
         }
     ],
-    "support": {
-        "email": "walkor@workerman.net",
-        "issues": "https://github.com/walkor/workerman/issues",
-        "forum": "http://wenda.workerman.net/",
-        "wiki": "http://doc.workerman.net/",
-        "source": "https://github.com/walkor/workerman"
-    },
     "require": {
-        "php": ">=5.3"
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-posix": "*",
+        "psr/log": "^1.0.1"
     },
     "suggest": {
-        "ext-event": "For better performance. "
+        "ext-event": "For better performance."
     },
     "autoload": {
         "psr-4": {
-            "Workerman\\": "./"
+            "ObservableWorker\\": "./"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

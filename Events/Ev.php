@@ -1,18 +1,18 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author  有个鬼<42765633@qq.com>
  * @link    http://www.workerman.net/
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Events;
+namespace ObservableWorker\Events;
 
-use Workerman\Worker;
+use ObservableWorker\Worker;
 use \EvWatcher;
 
 /**

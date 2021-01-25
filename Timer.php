@@ -1,27 +1,26 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman;
+namespace ObservableWorker;
 
-use Workerman\Events\EventInterface;
-use Workerman\Worker;
+use ObservableWorker\Events\EventInterface;
+use ObservableWorker\Worker;
 use \Exception;
 
 /**
  * Timer.
  *
  * example:
- * Workerman\Timer::add($time_interval, callback, array($arg1, $arg2..));
+ * ObservableWorker\Timer::add($time_interval, callback, array($arg1, $arg2..));
  */
 class Timer
 {
@@ -76,7 +75,7 @@ class Timer
             return;
         }
         if (\function_exists('pcntl_signal')) {
-            \pcntl_signal(\SIGALRM, array('\Workerman\Lib\Timer', 'signalHandle'), false);
+            \pcntl_signal(\SIGALRM, array('\ObservableWorker\Lib\Timer', 'signalHandle'), false);
         }
     }
 

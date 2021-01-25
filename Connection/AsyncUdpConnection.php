@@ -1,20 +1,19 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Connection;
+namespace ObservableWorker\Connection;
 
-use Workerman\Events\EventInterface;
-use Workerman\Worker;
+use ObservableWorker\Events\EventInterface;
+use ObservableWorker\Worker;
 use \Exception;
 
 /**
@@ -65,7 +64,7 @@ class AsyncUdpConnection extends UdpConnection
             $scheme         = \ucfirst($scheme);
             $this->protocol = '\\Protocols\\' . $scheme;
             if (!\class_exists($this->protocol)) {
-                $this->protocol = "\\Workerman\\Protocols\\$scheme";
+                $this->protocol = "\\ObservableWorker\\Protocols\\$scheme";
                 if (!\class_exists($this->protocol)) {
                     throw new Exception("class \\Protocols\\$scheme not exist");
                 }

@@ -1,21 +1,20 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Connection;
+namespace ObservableWorker\Connection;
 
-use Workerman\Events\EventInterface;
-use Workerman\Lib\Timer;
-use Workerman\Worker;
+use ObservableWorker\Events\EventInterface;
+use ObservableWorker\Lib\Timer;
+use ObservableWorker\Worker;
 use \Exception;
 
 /**
@@ -145,7 +144,7 @@ class AsyncTcpConnection extends TcpConnection
             $scheme         = \ucfirst($scheme);
             $this->protocol = '\\Protocols\\' . $scheme;
             if (!\class_exists($this->protocol)) {
-                $this->protocol = "\\Workerman\\Protocols\\$scheme";
+                $this->protocol = "\\ObservableWorker\\Protocols\\$scheme";
                 if (!\class_exists($this->protocol)) {
                     throw new Exception("class \\Protocols\\$scheme not exist");
                 }
@@ -195,7 +194,7 @@ class AsyncTcpConnection extends TcpConnection
         }
         // If failed attempt to emit onError callback.
         if (!$this->_socket || !\is_resource($this->_socket)) {
-            $this->emitError(\WORKERMAN_CONNECT_FAIL, $errstr);
+            $this->emitError(\ObservableWorker_CONNECT_FAIL, $errstr);
             if ($this->_status === self::STATUS_CLOSING) {
                 $this->destroy();
             }
@@ -365,7 +364,7 @@ class AsyncTcpConnection extends TcpConnection
             }
         } else {
             // Connection failed.
-            $this->emitError(\WORKERMAN_CONNECT_FAIL, 'connect ' . $this->_remoteAddress . ' fail after ' . round(\microtime(true) - $this->_connectStartTime, 4) . ' seconds');
+            $this->emitError(\ObservableWorker_CONNECT_FAIL, 'connect ' . $this->_remoteAddress . ' fail after ' . round(\microtime(true) - $this->_connectStartTime, 4) . ' seconds');
             if ($this->_status === self::STATUS_CLOSING) {
                 $this->destroy();
             }

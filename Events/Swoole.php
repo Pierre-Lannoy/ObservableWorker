@@ -1,17 +1,16 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
- * @author    Ares<aresrr#qq.com>
- * @link      http://www.workerman.net/
+ * @author    Ares<aresrr#qq.com> *
  * @link      https://github.com/ares333/Workerman
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Events;
+namespace ObservableWorker\Events;
 
 use Swoole\Event;
 use Swoole\Timer;
@@ -36,7 +35,7 @@ class Swoole implements EventInterface
      *
      * {@inheritdoc}
      *
-     * @see \Workerman\Events\EventInterface::add()
+     * @see \ObservableWorker\Events\EventInterface::add()
      */
     public function add($fd, $flag, $func, $args = null)
     {
@@ -120,7 +119,7 @@ class Swoole implements EventInterface
      *
      * {@inheritdoc}
      *
-     * @see \Workerman\Events\EventInterface::del()
+     * @see \ObservableWorker\Events\EventInterface::del()
      */
     public function del($fd, $flag)
     {
@@ -175,7 +174,7 @@ class Swoole implements EventInterface
      *
      * {@inheritdoc}
      *
-     * @see \Workerman\Events\EventInterface::clearAllTimer()
+     * @see \ObservableWorker\Events\EventInterface::clearAllTimer()
      */
     public function clearAllTimer()
     {
@@ -190,7 +189,7 @@ class Swoole implements EventInterface
      *
      * {@inheritdoc}
      *
-     * @see \Workerman\Events\EventInterface::loop()
+     * @see \ObservableWorker\Events\EventInterface::loop()
      */
     public function loop()
     {
@@ -201,7 +200,7 @@ class Swoole implements EventInterface
      *
      * {@inheritdoc}
      *
-     * @see \Workerman\Events\EventInterface::destroy()
+     * @see \ObservableWorker\Events\EventInterface::destroy()
      */
     public function destroy()
     {
@@ -213,7 +212,7 @@ class Swoole implements EventInterface
      *
      * {@inheritdoc}
      *
-     * @see \Workerman\Events\EventInterface::getTimerCount()
+     * @see \ObservableWorker\Events\EventInterface::getTimerCount()
      */
     public function getTimerCount()
     {

@@ -1,26 +1,25 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Protocols;
+namespace ObservableWorker\Protocols;
 
-use Workerman\Connection\ConnectionInterface;
-use Workerman\Connection\TcpConnection;
-use Workerman\Worker;
+use ObservableWorker\Connection\ConnectionInterface;
+use ObservableWorker\Connection\TcpConnection;
+use ObservableWorker\Worker;
 
 /**
  * WebSocket protocol.
  */
-class Websocket implements \Workerman\Protocols\ProtocolInterface
+class Websocket implements \ObservableWorker\Protocols\ProtocolInterface
 {
     /**
      * Websocket blob type.
@@ -261,7 +260,7 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
             if (\strlen($connection->tmpWebsocketData) > $connection->maxSendBufferSize) {
                 if ($connection->onError) {
                     try {
-                        \call_user_func($connection->onError, $connection, \WORKERMAN_SEND_FAIL, 'send buffer full and drop package');
+                        \call_user_func($connection->onError, $connection, \ObservableWorker_SEND_FAIL, 'send buffer full and drop package');
                     } catch (\Exception $e) {
                         Worker::log($e);
                         exit(250);
@@ -355,7 +354,7 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
             if (\preg_match("/Sec-WebSocket-Key: *(.*?)\r\n/i", $buffer, $match)) {
                 $Sec_WebSocket_Key = $match[1];
             } else {
-                $connection->send("HTTP/1.1 200 Websocket\r\nServer: workerman/".Worker::VERSION."\r\n\r\n<div style=\"text-align:center\"><h1>Websocket</h1><hr>powered by <a href=\"https://www.workerman.net\">workerman ".Worker::VERSION."</a></div>",
+                $connection->send("HTTP/1.1 200 Websocket\r\nServer: observableworker/".Worker::VERSION."\r\n\r\n<div style=\"text-align:center\"><h1>Websocket</h1><hr>powered by <a href=\"https://github.com/Pierre-Lannoy/ObservableWorker\">ObservableWorker ".Worker::VERSION."</a></div>",
                     true);
                 $connection->close();
                 return 0;
@@ -416,7 +415,7 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
                 }
             }
             if (!$has_server_header) {
-                $handshake_message .= "Server: workerman/".Worker::VERSION."\r\n";
+                $handshake_message .= "Server: observableworker/".Worker::VERSION."\r\n";
             }
             $handshake_message .= "\r\n";
             // Send handshake response.
@@ -440,7 +439,7 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
             return 0;
         }
         // Bad websocket handshake request.
-        $connection->send("HTTP/1.1 200 Websocket\r\nServer: workerman/".Worker::VERSION."\r\n\r\n<div style=\"text-align:center\"><h1>Websocket</h1><hr>powered by <a href=\"https://www.workerman.net\">workerman ".Worker::VERSION."</a></div>",
+        $connection->send("HTTP/1.1 200 Websocket\r\nServer: observableworker/".Worker::VERSION."\r\n\r\n<div style=\"text-align:center\"><h1>Websocket</h1><hr>powered by <a href=\"https://github.com/Pierre-Lannoy/ObservableWorker\">observableworker ".Worker::VERSION."</a></div>",
             true);
         $connection->close();
         return 0;

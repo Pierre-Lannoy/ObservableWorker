@@ -1,20 +1,19 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Connection;
+namespace ObservableWorker\Connection;
 
-use Workerman\Events\EventInterface;
-use Workerman\Worker;
+use ObservableWorker\Events\EventInterface;
+use ObservableWorker\Worker;
 use \Exception;
 
 /**
@@ -101,9 +100,9 @@ class TcpConnection extends ConnectionInterface
 
     /**
      * Application layer protocol.
-     * The format is like this Workerman\\Protocols\\Http.
+     * The format is like this ObservableWorker\\Protocols\\Http.
      *
-     * @var \Workerman\Protocols\ProtocolInterface
+     * @var \ObservableWorker\Protocols\ProtocolInterface
      */
     public $protocol = null;
 
@@ -367,7 +366,7 @@ class TcpConnection extends ConnectionInterface
                     ++self::$statistics['send_fail'];
                     if ($this->onError) {
                         try {
-                            \call_user_func($this->onError, $this, \WORKERMAN_SEND_FAIL, 'client closed');
+                            \call_user_func($this->onError, $this, \ObservableWorker_SEND_FAIL, 'client closed');
                         } catch (\Exception $e) {
                             Worker::log($e);
                             exit(250);
@@ -880,7 +879,7 @@ class TcpConnection extends ConnectionInterface
         if ($this->maxSendBufferSize <= \strlen($this->_sendBuffer)) {
             if ($this->onError) {
                 try {
-                    \call_user_func($this->onError, $this, \WORKERMAN_SEND_FAIL, 'send buffer full and drop package');
+                    \call_user_func($this->onError, $this, \ObservableWorker_SEND_FAIL, 'send buffer full and drop package');
                 } catch (\Exception $e) {
                     Worker::log($e);
                     exit(250);

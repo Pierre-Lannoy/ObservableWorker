@@ -1,27 +1,26 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Protocols;
+namespace ObservableWorker\Protocols;
 
-use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http\Request;
-use Workerman\Protocols\Http\Response;
-use Workerman\Protocols\Websocket;
-use Workerman\Worker;
+use ObservableWorker\Connection\TcpConnection;
+use ObservableWorker\Protocols\Http\Request;
+use ObservableWorker\Protocols\Http\Response;
+use ObservableWorker\Protocols\Websocket;
+use ObservableWorker\Worker;
 
 /**
  * Class Http.
- * @package Workerman\Protocols
+ * @package ObservableWorker\Protocols
  */
 class Http
 {
@@ -30,7 +29,7 @@ class Http
      *
      * @var string
      */
-    protected static $_requestClass = 'Workerman\Protocols\Http\Request';
+    protected static $_requestClass = 'ObservableWorker\Protocols\Http\Request';
 
     /**
      * Session name.
@@ -157,7 +156,7 @@ class Http
      *
      * @param string $recv_buffer
      * @param TcpConnection $connection
-     * @return \Workerman\Protocols\Http\Request
+     * @return \ObservableWorker\Protocols\Http\Request
      */
     public static function decode($recv_buffer, TcpConnection $connection)
     {
@@ -211,7 +210,7 @@ class Http
                 unset($connection->__header);
             }
             $body_len = \strlen($response);
-            return "HTTP/1.1 200 OK\r\nServer: workerman\r\n{$ext_header}Connection: keep-alive\r\nContent-Type: text/html;charset=utf-8\r\nContent-Length: $body_len\r\n\r\n$response";
+            return "HTTP/1.1 200 OK\r\nServer: ObservableWorker\r\n{$ext_header}Connection: keep-alive\r\nContent-Type: text/html;charset=utf-8\r\nContent-Length: $body_len\r\n\r\n$response";
         }
 
         if (isset($connection->__header)) {

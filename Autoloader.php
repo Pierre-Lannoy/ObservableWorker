@@ -1,17 +1,16 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman;
+namespace ObservableWorker;
 
 /**
  * Autoload.
@@ -45,8 +44,8 @@ class Autoloader
     public static function loadByNamespace($name)
     {
         $class_path = \str_replace('\\', \DIRECTORY_SEPARATOR, $name);
-        if (\strpos($name, 'Workerman\\') === 0) {
-            $class_file = __DIR__ . \substr($class_path, \strlen('Workerman')) . '.php';
+        if (\strpos($name, 'ObservableWorker\\') === 0) {
+            $class_file = __DIR__ . \substr($class_path, \strlen('ObservableWorker')) . '.php';
         } else {
             if (self::$_autoloadRootPath) {
                 $class_file = self::$_autoloadRootPath . \DIRECTORY_SEPARATOR . $class_path . '.php';
@@ -66,4 +65,4 @@ class Autoloader
     }
 }
 
-\spl_autoload_register('\Workerman\Autoloader::loadByNamespace');
+\spl_autoload_register('\ObservableWorker\Autoloader::loadByNamespace');

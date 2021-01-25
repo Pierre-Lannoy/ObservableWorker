@@ -1,21 +1,20 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Protocols\Http;
+namespace ObservableWorker\Protocols\Http;
 
 /**
  * Class Response
- * @package Workerman\Protocols\Http
+ * @package ObservableWorker\Protocols\Http
  */
 class Response
 {
@@ -331,7 +330,7 @@ class Response
         $head = "HTTP/{$this->_version} {$this->_status} $reason\r\n";
         $headers = $this->_header;
         if (!isset($headers['Server'])) {
-            $head .= "Server: workerman\r\n";
+            $head .= "Server: ObservableWorker\r\n";
         }
         foreach ($headers as $name => $value) {
             if (\is_array($value)) {
@@ -385,13 +384,13 @@ class Response
         $reason = $this->_reason ? $this->_reason : static::$_phrases[$this->_status];
         $body_len = \strlen($this->_body);
         if (empty($this->_header)) {
-            return "HTTP/{$this->_version} {$this->_status} $reason\r\nServer: workerman\r\nContent-Type: text/html;charset=utf-8\r\nContent-Length: $body_len\r\nConnection: keep-alive\r\n\r\n{$this->_body}";
+            return "HTTP/{$this->_version} {$this->_status} $reason\r\nServer: ObservableWorker\r\nContent-Type: text/html;charset=utf-8\r\nContent-Length: $body_len\r\nConnection: keep-alive\r\n\r\n{$this->_body}";
         }
 
         $head = "HTTP/{$this->_version} {$this->_status} $reason\r\n";
         $headers = $this->_header;
         if (!isset($headers['Server'])) {
-            $head .= "Server: workerman\r\n";
+            $head .= "Server: ObservableWorker\r\n";
         }
         foreach ($headers as $name => $value) {
             if (\is_array($value)) {

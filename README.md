@@ -29,7 +29,7 @@ composer require workerman/workerman
 ```php
 <?php
 
-use Workerman\Worker;
+use ObservableWorker\Worker;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -61,7 +61,7 @@ Worker::runAll();
 
 ### An http server
 ```php
-use Workerman\Worker;
+use ObservableWorker\Worker;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -92,7 +92,7 @@ Worker::runAll();
 
 ### A tcp server
 ```php
-use Workerman\Worker;
+use ObservableWorker\Worker;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -125,7 +125,7 @@ Worker::runAll();
 ```php
 <?php
 
-use Workerman\Worker;
+use ObservableWorker\Worker;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -192,7 +192,7 @@ class MyTextProtocol
 ```
 
 ```php
-use Workerman\Worker;
+use ObservableWorker\Worker;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -219,8 +219,8 @@ Worker::runAll();
 ### Timer
 ```php
 
-use Workerman\Worker;
-use Workerman\Timer;
+use ObservableWorker\Worker;
+use ObservableWorker\Timer;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -240,8 +240,8 @@ Worker::runAll();
 ### AsyncTcpConnection (tcp/ws/text/frame etc...)
 ```php
 
-use Workerman\Worker;
-use Workerman\Connection\AsyncTcpConnection;
+use ObservableWorker\Worker;
+use ObservableWorker\Connection\AsyncTcpConnection;
 
 require_once __DIR__ . '/vendor/autoload.php';
 

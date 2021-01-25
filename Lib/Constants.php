@@ -1,29 +1,32 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  *
- * @link      http://www.workerman.net/
+ * @author    Pierre Lannoy <https://pierre.lannoy.fr/>
+ * @copyright Pierre Lannoy <https://pierre.lannoy.fr/>
+ * @link      https://github.com/Pierre-Lannoy/ObservableWorker
+ *
  */
 
 // Display errors.
-ini_set('display_errors', 'on');
+// ini_set('display_errors', 'on');
 // Reporting all.
-error_reporting(E_ALL);
+// error_reporting(E_ALL);
 // JIT is not stable, temporarily disabled.
 ini_set('pcre.jit', 0);
 
 // For onError callback.
-const WORKERMAN_CONNECT_FAIL = 1;
+const OBSERVABLEWORKER_CONNECT_FAIL = 1;
 // For onError callback.
-const WORKERMAN_SEND_FAIL = 2;
+const OBSERVABLEWORKER_SEND_FAIL = 2;
 
 // Define OS Type
 const OS_TYPE_LINUX   = 'linux';

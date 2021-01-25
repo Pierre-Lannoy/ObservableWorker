@@ -1,26 +1,25 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Protocols\Http;
+namespace ObservableWorker\Protocols\Http;
 
-use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http\Session;
-use Workerman\Protocols\Http;
-use Workerman\Worker;
+use ObservableWorker\Connection\TcpConnection;
+use ObservableWorker\Protocols\Http\Session;
+use ObservableWorker\Protocols\Http;
+use ObservableWorker\Worker;
 
 /**
  * Class Request
- * @package Workerman\Protocols\Http
+ * @package ObservableWorker\Protocols\Http
  */
 class Request
 {
@@ -271,7 +270,7 @@ class Request
     /**
      * Get session.
      *
-     * @return bool|\Workerman\Protocols\Http\Session
+     * @return bool|\ObservableWorker\Protocols\Http\Session
      */
     public function session()
     {
@@ -512,7 +511,7 @@ class Request
                             if (!$tmp_upload_dir) {
                                 $error = UPLOAD_ERR_NO_TMP_DIR;
                             } else {
-                                $tmp_file = \tempnam($tmp_upload_dir, 'workerman.upload.');
+                                $tmp_file = \tempnam($tmp_upload_dir, 'observableworker.upload.');
                                 if ($tmp_file === false || false == \file_put_contents($tmp_file, $boundary_value)) {
                                     $error = UPLOAD_ERR_CANT_WRITE;
                                 }

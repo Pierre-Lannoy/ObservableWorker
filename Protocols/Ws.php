@@ -1,22 +1,21 @@
 <?php
 /**
- * This file is part of workerman.
+ * This file is part of ObservableWorker.
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
+ * Licensed under The MIT License.
+ * For full copyright and license information, please see the LICENSE.txt file.
  * Redistributions of files must retain the above copyright notice.
  *
  * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
+ * @copyright walkor<walkor@workerman.net> *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-namespace Workerman\Protocols;
+namespace ObservableWorker\Protocols;
 
-use Workerman\Worker;
-use Workerman\Lib\Timer;
-use Workerman\Connection\TcpConnection;
-use Workerman\Connection\ConnectionInterface;
+use ObservableWorker\Worker;
+use ObservableWorker\Lib\Timer;
+use ObservableWorker\Connection\TcpConnection;
+use ObservableWorker\Connection\ConnectionInterface;
 
 /**
  * Websocket protocol for client.
@@ -262,7 +261,7 @@ class Ws
             if (\strlen($connection->tmpWebsocketData) > $connection->maxSendBufferSize) {
                 if ($connection->onError) {
                     try {
-                        \call_user_func($connection->onError, $connection, \WORKERMAN_SEND_FAIL, 'send buffer full and drop package');
+                        \call_user_func($connection->onError, $connection, \ObservableWorker_SEND_FAIL, 'send buffer full and drop package');
                     } catch (\Exception $e) {
                         Worker::log($e);
                         exit(250);
