@@ -930,7 +930,7 @@ class Worker
             	self::terminate();
             }
         } elseif ($command !== 'start' && $command !== 'restart') {
-	        self::log( LogLevel::WARNING, 'Not run.' );
+	        self::log( LogLevel::WARNING, 'Not running.' );
 	        self::terminate();
         }
 
@@ -2153,13 +2153,13 @@ class Worker
 	}
 
 	/**
-	 * Abort exectution.
+	 * Abort execution.
 	 *
 	 * @param   integer        $code       Optional. The exit code.
 	 */
 	private static function abort( $code = 0 ) {
-		if ( isset( self::$logger ) && 0 !== $code) {
-			if ( 0 !== $code) {
+		if ( isset( self::$logger ) ) {
+			if ( 0 !== $code && 1 !== $code ) {
 				self::$logger->emergency( 'Stopping immediately.', [ 'code' => $code ] );
 			} else {
 				self::$logger->notice( 'Stopped.' );
@@ -2169,7 +2169,7 @@ class Worker
 	}
 
 	/**
-	 * Terminate exectution.
+	 * Terminate execution.
 	 */
 	private static function terminate() {
 		self::abort();
