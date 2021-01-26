@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [5.2.0] - 2021-01-26
 
-## Added
+### Added
 - Exit code management for Docker health-check.
 
 ### Changed
