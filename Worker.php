@@ -264,7 +264,15 @@ class Worker
      */
     public static $stdoutFile = '/dev/null';
 
-    /**
+	/**
+	 * Usage help.
+	 *
+	 * @var string
+	 */
+	public static $usage = "Usage: php yourfile <command> [mode]\nCommands: \nstart\t\tStart worker in DEBUG mode.\n\t\tUse mode -d to start in DAEMON mode.\nstop\t\tStop worker.\n\t\tUse mode -g to stop gracefully.\nrestart\t\tRestart workers.\n\t\tUse mode -d to start in DAEMON mode.\n\t\tUse mode -g to stop gracefully.\nreload\t\tReload codes.\n\t\tUse mode -g to reload gracefully.\nstatus\t\tGet worker status.\n\t\tUse mode -d to show live status.\nconnections\tGet worker connections.\n";
+
+
+	/**
      * The file to store master process PID.
      *
      * @var string
@@ -883,7 +891,6 @@ class Worker
         global $argv;
         // Check argv;
         $start_file = $argv[0];
-        $usage = "Usage: php yourfile <command> [mode]\nCommands: \nstart\t\tStart worker in DEBUG mode.\n\t\tUse mode -d to start in DAEMON mode.\nstop\t\tStop worker.\n\t\tUse mode -g to stop gracefully.\nrestart\t\tRestart workers.\n\t\tUse mode -d to start in DAEMON mode.\n\t\tUse mode -g to stop gracefully.\nreload\t\tReload codes.\n\t\tUse mode -g to reload gracefully.\nstatus\t\tGet worker status.\n\t\tUse mode -d to show live status.\nconnections\tGet worker connections.\n";
         $available_commands = array(
             'start',
             'stop',
@@ -906,7 +913,7 @@ class Worker
         }
 
         if (!$command) {
-            exit($usage);
+            exit(self::$usage);
         }
 
         // Start command.
@@ -1027,7 +1034,7 @@ class Worker
                 if (isset($command)) {
                     static::safeEcho('Unknown command: ' . $command . "\n");
                 }
-                exit($usage);
+	            exit(self::$usage);
         }
     }
 
