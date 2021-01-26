@@ -931,7 +931,7 @@ class Worker
             }
         } elseif ($command !== 'start' && $command !== 'restart') {
 	        self::log( LogLevel::WARNING, 'Not running.' );
-	        self::terminate();
+	        self::abort( 1 );
         }
 
         // execute command.
