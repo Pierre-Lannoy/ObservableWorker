@@ -2170,7 +2170,7 @@ class Worker
 			if ( 0 !== $code && 1 !== $code ) {
 				self::$logger->emergency( 'Stopping immediately.', [ 'code' => $code ] );
 			} else {
-				self::$logger->notice( 'Stopped.' );
+				//self::$logger->notice( 'Stopped.' );
 			}
 		}
 		exit( $code );

@@ -6,11 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [5.2.0] - 2021-01-26
 
 ## Added
-- Exit code management for Docker healthcheck.
+- Exit code management for Docker health-check.
 
 ### Changed
 - Improved `status` command.
 - It's now possible to override usage display.
+
+### Removed
+- 'Stopped' notice as it must be advertised at application level.
 
 ## [5.1.0] - 2021-01-25
 
