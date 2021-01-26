@@ -924,15 +924,16 @@ class Worker
         $master_pid      = \is_file(static::$pidFile) ? \file_get_contents(static::$pidFile) : 0;
         $master_is_alive = $master_pid && \posix_kill($master_pid, 0) && \posix_getpid() !== $master_pid;
         // Master is still alive?
-        if ($master_is_alive) {
-            if ($command === 'start') {
-            	self::log( LogLevel::WARNING, 'Already running.' );
-            	self::terminate();
-            }
-        } elseif ($command !== 'start' && $command !== 'restart') {
-	        self::log( LogLevel::WARNING, 'Not running.' );
-	        self::abort( 1 );
-        }
+	    // Master is still alive?
+	    if ($master_is_alive) {
+		    if ($command === 'start') {
+			    self::log( LogLevel::WARNING, static::$processTitle . ' is already running.' );
+			    self::terminate();
+		    }
+	    } elseif ($command !== 'start' && $command !== 'restart') {
+		    self::log( LogLevel::WARNING, static::$processTitle . ' is not running.' );
+		    self::abort( 1 );
+	    }
 
         // execute command.
         switch ($command) {
